@@ -1,0 +1,191 @@
+<div class="min-h-dvh bg-slate-950 text-slate-100">
+  <header class="sticky top-0 z-20 border-b border-white/5 bg-slate-950/85 backdrop-blur">
+    <div class="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-3">
+      <a routerLink="/" class="flex items-baseline gap-2" aria-label="Inicio">
+        <app-brand-logo />
+        <span class="hidden text-sm font-semibold text-slate-400 sm:inline">Live</span>
+      </a>
+      <div class="flex items-center gap-4">
+        <div class="text-right leading-tight">
+          <div class="text-[10px] font-semibold uppercase tracking-widest text-slate-500">PIN</div>
+          <div class="font-mono text-lg font-bold tracking-[0.2em]" data-testid="pin">{{ pin() }}</div>
+        </div>
+        @if (connected()) {
+          <span class="flex items-center gap-1.5 text-xs font-bold tracking-widest text-emerald-400" data-testid="live-indicator">
+            <span class="relative flex size-2.5">
+              <span class="absolute inline-flex size-full animate-ping rounded-full bg-emerald-400 opacity-60"></span>
+              <span class="relative inline-flex size-2.5 rounded-full bg-emerald-400"></span>
+            </span>
+            LIVE
+          </span>
+        } @else {
+          <span class="flex items-center gap-1.5 text-xs font-bold tracking-widest text-amber-400">
+            <span class="inline-flex size-2.5 rounded-full bg-amber-400"></span>
+            OFFLINE
+          </span>
+        }
+      </div>
+    </div>
+  </header>
+
+  @if (status() === 'RECONNECTING') {
+    <div class="border-b border-amber-500/20 bg-amber-500/10 px-4 py-2 text-center text-sm text-amber-200" role="status">
+      Reconnecting… tu pregunta actual y el historial se conservan.
+    </div>
+  }
+
+  <main class="mx-auto grid max-w-6xl gap-4 px-4 py-4 lg:grid-cols-[minmax(0,1fr)_340px] lg:py-6">
+    <section class="min-w-0 space-y-4">
+      <div class="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-slate-400">
+        <app-status-badge [status]="status()" />
+        <span>Jugador: <b class="font-semibold text-slate-200">Viewer</b></span>
+        <span>
+          Última actualización:
+          <b class="font-mono font-semibold text-slate-200">{{ state().lastUpdate ? (state().lastUpdate | date: 'HH:mm:ss') : '—' }}</b>
+        </span>
+        <button
+          type="button"
+          role="switch"
+          [attr.aria-checked]="autoNext()"
+          (click)="toggleAutoNext()"
+          class="ml-auto inline-flex items-center gap-2 rounded-full bg-white/5 px-3 py-1.5 font-bold tracking-widest text-slate-300 ring-1 ring-white/10 hover:bg-white/10"
+        >
+          <span class="relative inline-flex h-4 w-7 rounded-full transition" [class]="autoNext() ? 'bg-violet-500' : 'bg-slate-600'">
+            <span class="absolute top-0.5 size-3 rounded-full bg-white transition-all" [class]="autoNext() ? 'left-3.5' : 'left-0.5'"></span>
+          </span>
+          AUTO NEXT
+        </button>
+      </div>
+
+      @if (status() === 'ERROR') {
+        <div class="rounded-2xl border border-red-500/30 bg-red-500/10 p-6 text-center" role="alert">
+          <p class="text-lg font-semibold text-red-200">{{ store.connectError() ?? state().error ?? 'Se perdió la conexión con la partida.' }}</p>
+          <a routerLink="/" class="mt-4 inline-block rounded-xl bg-white/10 px-5 py-2.5 font-semibold hover:bg-white/15">Ingresar otro PIN</a>
+        </div>
+      } @else if (view(); as q) {
+        @if (newQuestionWaiting()) {
+          <button
+            type="button"
+            (click)="backToLive()"
+            class="w-full rounded-xl bg-rose-500/15 px-4 py-3 text-sm font-bold text-rose-200 ring-1 ring-rose-400/40 hover:bg-rose-500/25"
+          >
+            ● Nueva pregunta en vivo · Ver ahora
+          </button>
+        } @else if (!q.live) {
+          <div class="flex items-center justify-between gap-3 rounded-xl bg-white/5 px-4 py-3 text-sm text-slate-300 ring-1 ring-white/10">
+            <span>Estás consultando la pregunta {{ q.number }} (cerrada).</span>
+            <button type="button" (click)="backToLive()" class="font-bold text-violet-300 hover:text-violet-200">Volver al vivo</button>
+          </div>
+        }
+
+        <article class="overflow-hidden rounded-2xl bg-slate-900 ring-1 ring-white/10" data-testid="question-card">
+          <div class="flex items-center justify-between gap-4 border-b border-white/5 px-5 py-4">
+            <h2 class="text-sm font-black tracking-[0.2em] text-slate-300" data-testid="question-number">
+              PREGUNTA {{ q.number }} / {{ q.total }}
+            </h2>
+            @if (q.live && status() === 'QUESTION') {
+              <div
+                class="flex size-12 items-center justify-center rounded-full font-mono text-lg font-black ring-4"
+                [class]="secondsLeft() <= 5 ? 'text-rose-300 ring-rose-500/60' : 'text-white ring-violet-500/60'"
+                aria-label="Segundos restantes"
+                data-testid="countdown"
+              >
+                {{ secondsLeft() }}
+              </div>
+            }
+          </div>
+          @if (q.live && status() === 'QUESTION') {
+            <div class="h-1 bg-white/5">
+              <div class="h-full bg-violet-500 transition-[width] duration-300 ease-linear" [style.width.%]="progress()"></div>
+            </div>
+          }
+
+          <div class="space-y-5 px-5 py-6 sm:px-8">
+            <p class="text-xl font-bold leading-snug text-white sm:text-2xl" data-testid="question-text">{{ q.text }}</p>
+
+            <ol class="grid gap-3 sm:grid-cols-2">
+              @for (choice of q.choices; track choice.index) {
+                @let isCorrect = q.correctIndex === choice.index;
+                <li
+                  class="flex items-center gap-3 rounded-xl px-3 py-3 ring-1 transition"
+                  [class]="
+                    isCorrect
+                      ? 'bg-emerald-500/15 ring-2 ring-emerald-400 shadow-lg shadow-emerald-500/20'
+                      : q.correctIndex !== null
+                        ? 'bg-white/[0.03] ring-white/5 opacity-50'
+                        : 'bg-white/5 ring-white/10'
+                  "
+                  [attr.data-correct]="isCorrect"
+                >
+                  <span class="flex size-9 shrink-0 items-center justify-center rounded-lg text-base font-black text-white" [class]="accent(choice.index)">
+                    {{ letter(choice.index) }}
+                  </span>
+                  <span class="min-w-0 flex-1 font-semibold text-slate-100">{{ choice.text }}</span>
+                  @if (isCorrect) {
+                    <span class="text-xl font-black text-emerald-300" aria-label="Respuesta correcta">✓</span>
+                  }
+                </li>
+              }
+            </ol>
+          </div>
+
+          <div class="border-t border-white/5 bg-black/20 px-5 py-5 text-center sm:px-8" aria-live="polite">
+            <div class="text-[11px] font-black tracking-[0.3em] text-slate-500">RESPUESTA</div>
+            @if (q.correctIndex !== null) {
+              <p class="mt-2 text-2xl font-black text-emerald-300 sm:text-3xl" data-testid="answer">
+                ✓ {{ letter(q.correctIndex) }} — {{ q.correctText }}
+              </p>
+            } @else {
+              <p class="mt-2 text-base font-semibold text-slate-400" data-testid="answer-pending">
+                Esperando la respuesta del servidor…
+              </p>
+            }
+          </div>
+        </article>
+
+        @if (status() === 'FINISHED') {
+          <div class="rounded-2xl bg-violet-500/10 p-5 text-center ring-1 ring-violet-400/30">
+            <p class="text-lg font-black text-violet-200">Partida finalizada</p>
+            <p class="mt-1 text-sm text-violet-200/70">{{ state().history.length }} preguntas jugadas. Revisa el historial cuando quieras.</p>
+          </div>
+        }
+      } @else {
+        <div class="rounded-2xl bg-slate-900 p-8 text-center ring-1 ring-white/10" data-testid="waiting">
+          @if (status() === 'FINISHED') {
+            <p class="text-xl font-black text-violet-200">Partida finalizada</p>
+          } @else {
+            <div class="mx-auto mb-4 size-10 animate-spin rounded-full border-4 border-violet-500/30 border-t-violet-400"></div>
+            <p class="text-xl font-bold text-white">{{ state().quizTitle ?? 'Conectando a la partida…' }}</p>
+            <p class="mt-2 text-slate-400">Esperando que el anfitrión inicie la partida.</p>
+          }
+        </div>
+      }
+    </section>
+
+    <aside class="min-w-0 rounded-2xl bg-slate-900 ring-1 ring-white/10 lg:sticky lg:top-24 lg:max-h-[calc(100dvh-8rem)] lg:overflow-y-auto">
+      <div class="flex items-center justify-between border-b border-white/5 px-5 py-4">
+        <h2 class="text-sm font-black tracking-widest text-slate-300">Preguntas anteriores</h2>
+        <span class="text-xs text-slate-500">{{ previous().length }}</span>
+      </div>
+      @if (previous().length === 0) {
+        <p class="px-5 py-6 text-sm text-slate-500">Aquí aparecerán las preguntas cerradas con su respuesta correcta.</p>
+      } @else {
+        <ol class="divide-y divide-white/5" data-testid="history">
+          @for (item of previous(); track item.questionNumber) {
+            <li>
+              <button
+                type="button"
+                (click)="open(item)"
+                class="w-full px-5 py-3 text-left transition hover:bg-white/5 aria-[current=true]:bg-violet-500/10"
+                [attr.aria-current]="selected()?.questionNumber === item.questionNumber"
+              >
+                <span class="line-clamp-2 text-sm font-semibold text-slate-200">{{ item.questionNumber }}. {{ item.question }}</span>
+                <span class="mt-1 block text-xs font-bold text-emerald-300">Correcta: {{ letter(item.correctIndex) }} — {{ item.correctText }}</span>
+              </button>
+            </li>
+          }
+        </ol>
+      }
+    </aside>
+  </main>
+</div>

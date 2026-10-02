@@ -1,0 +1,92 @@
+<form class="space-y-5" (submit)="save($event)">
+  <div class="flex flex-wrap items-center justify-between gap-3">
+    <h1 class="text-2xl font-black">{{ id() ? 'Editar quiz' : 'Crear quiz' }}</h1>
+    <div class="flex gap-2">
+      <a routerLink="/admin" class="rounded-xl px-4 py-2.5 text-sm font-bold text-slate-300 hover:bg-white/5">Cancelar</a>
+      <button type="submit" [disabled]="saving()" class="rounded-xl bg-violet-600 px-5 py-2.5 text-sm font-black tracking-wide hover:bg-violet-500 disabled:opacity-40">
+        {{ saving() ? 'Guardando…' : 'Guardar' }}
+      </button>
+    </div>
+  </div>
+
+  @if (error(); as message) {
+    <p class="rounded-xl bg-rose-500/10 px-4 py-3 text-sm font-semibold text-rose-200 ring-1 ring-rose-400/30" role="alert">{{ message }}</p>
+  }
+
+  <section class="space-y-3 rounded-2xl bg-slate-900 p-5 ring-1 ring-white/10">
+    <label class="block text-sm font-semibold text-slate-300">
+      Título
+      <input [value]="quiz().title" (input)="setTitle(text($event))" maxlength="120" required
+             class="mt-1 w-full rounded-xl bg-slate-950 px-3 py-2.5 ring-1 ring-white/10 outline-none focus:ring-2 focus:ring-violet-500" />
+    </label>
+    <label class="block text-sm font-semibold text-slate-300">
+      Descripción (opcional)
+      <input [value]="quiz().description ?? ''" (input)="setDescription(text($event))" maxlength="500"
+             class="mt-1 w-full rounded-xl bg-slate-950 px-3 py-2.5 ring-1 ring-white/10 outline-none focus:ring-2 focus:ring-violet-500" />
+    </label>
+  </section>
+
+  @for (question of quiz().questions; track $index; let qi = $index, first = $first, last = $last) {
+    <section class="space-y-4 rounded-2xl bg-slate-900 p-5 ring-1 ring-white/10">
+      <div class="flex flex-wrap items-center justify-between gap-2">
+        <h2 class="text-sm font-black tracking-widest text-slate-400">PREGUNTA {{ qi + 1 }}</h2>
+        <div class="flex items-center gap-1 text-sm">
+          <button type="button" (click)="moveQuestion(qi, -1)" [disabled]="first" class="rounded-lg px-2 py-1 hover:bg-white/5 disabled:opacity-30" aria-label="Subir">↑</button>
+          <button type="button" (click)="moveQuestion(qi, 1)" [disabled]="last" class="rounded-lg px-2 py-1 hover:bg-white/5 disabled:opacity-30" aria-label="Bajar">↓</button>
+          <button type="button" (click)="removeQuestion(qi)" [disabled]="quiz().questions.length === 1"
+                  class="rounded-lg px-2 py-1 font-semibold text-rose-300 hover:bg-rose-500/10 disabled:opacity-30">Quitar</button>
+        </div>
+      </div>
+
+      <input [value]="question.text" (input)="updateQuestion(qi, { text: text($event) })" maxlength="300" required
+             placeholder="¿Cuál es la capital del Ecuador?"
+             class="w-full rounded-xl bg-slate-950 px-3 py-2.5 text-lg font-semibold ring-1 ring-white/10 outline-none focus:ring-2 focus:ring-violet-500" />
+
+      <div class="flex flex-wrap gap-3 text-sm">
+        <label class="flex items-center gap-2 font-semibold text-slate-300">
+          Tipo
+          <select [value]="question.type" (change)="setType(qi, $any(text($event)))"
+                  class="rounded-lg bg-slate-950 px-2 py-1.5 ring-1 ring-white/10">
+            <option value="SINGLE_CHOICE">Opción única</option>
+            <option value="TRUE_FALSE">Verdadero / Falso</option>
+          </select>
+        </label>
+        <label class="flex items-center gap-2 font-semibold text-slate-300">
+          Tiempo
+          <select [value]="question.timeLimit" (change)="updateQuestion(qi, { timeLimit: +text($event) })"
+                  class="rounded-lg bg-slate-950 px-2 py-1.5 ring-1 ring-white/10">
+            @for (seconds of timeLimits; track seconds) {
+              <option [value]="seconds">{{ seconds }} s</option>
+            }
+          </select>
+        </label>
+      </div>
+
+      <fieldset class="grid gap-2 sm:grid-cols-2">
+        <legend class="mb-2 text-xs text-slate-500">Marca la respuesta correcta</legend>
+        @for (choice of question.choices; track $index; let ci = $index) {
+          <div class="flex items-center gap-2 rounded-xl bg-slate-950 p-2 ring-1"
+               [class]="choice.correct ? 'ring-emerald-400' : 'ring-white/10'">
+            <span class="flex size-8 shrink-0 items-center justify-center rounded-lg font-black" [class]="accent(ci)">{{ letter(ci) }}</span>
+            <input [value]="choice.text" (input)="setChoiceText(qi, ci, text($event))" maxlength="120" required
+                   [readonly]="question.type === 'TRUE_FALSE'" [attr.aria-label]="'Opción ' + letter(ci)"
+                   class="min-w-0 flex-1 bg-transparent px-1 py-1 outline-none" />
+            <input type="radio" [name]="'correct-' + qi" [checked]="choice.correct" (change)="markCorrect(qi, ci)"
+                   class="size-4 accent-emerald-500" [attr.aria-label]="'Marcar ' + letter(ci) + ' como correcta'" />
+            @if (question.type === 'SINGLE_CHOICE' && question.choices.length > 2) {
+              <button type="button" (click)="removeChoice(qi, ci)" class="px-1 text-slate-500 hover:text-rose-300" aria-label="Quitar opción">✕</button>
+            }
+          </div>
+        }
+      </fieldset>
+      @if (question.type === 'SINGLE_CHOICE' && question.choices.length < maxChoices) {
+        <button type="button" (click)="addChoice(qi)" class="text-sm font-bold text-violet-300 hover:text-violet-200">+ Agregar opción</button>
+      }
+    </section>
+  }
+
+  <button type="button" (click)="addQuestion()"
+          class="w-full rounded-2xl border-2 border-dashed border-white/10 py-4 font-bold text-slate-400 hover:border-violet-500/50 hover:text-violet-200">
+    + Agregar pregunta
+  </button>
+</form>
