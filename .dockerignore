@@ -1,0 +1,11 @@
+.git/
+.github/
+docs/
+e2e/
+loadtest/
+.env
+.env.*
+**/node_modules/
+**/dist/
+**/.angular/
+**/target/

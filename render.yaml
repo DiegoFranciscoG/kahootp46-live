@@ -1,0 +1,40 @@
+# Render Blueprint: one free web service (Docker, backend + Angular bundle) and one free Key Value (Redis).
+# PostgreSQL comes from Neon (Render's free Postgres expires after 30 days). See docs/despliegue.md.
+services:
+  - type: web
+    name: kahootp46-live
+    runtime: docker
+    plan: free
+    dockerfilePath: ./Dockerfile
+    dockerContext: ./
+    healthCheckPath: /actuator/health/readiness
+    envVars:
+      # Neon DIRECT connection (not the -pooler host): Flyway needs session-level features.
+      # Example shape: jdbc:postgresql://<host>/<db>?sslmode=require
+      - key: DB_URL
+        sync: false
+      - key: DB_USER
+        sync: false
+      - key: DB_PASSWORD
+        sync: false
+      - key: REDIS_URL
+        fromService:
+          type: keyvalue
+          name: kahootp46-redis
+          property: connectionString
+      - key: JWT_SECRET
+        generateValue: true
+      - key: ADMIN_EMAIL
+        sync: false
+      - key: ADMIN_PASSWORD
+        sync: false
+      # demo loads two fictitious quizzes on first start; remove this variable to start empty.
+      - key: SPRING_PROFILES_ACTIVE
+        value: demo
+
+  - type: keyvalue
+    name: kahootp46-redis
+    plan: free
+    # Empty list = reachable only from services in the same Render account/region.
+    ipAllowList: []
+    maxmemoryPolicy: allkeys-lru
