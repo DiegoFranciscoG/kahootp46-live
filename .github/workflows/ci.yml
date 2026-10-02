@@ -17,7 +17,7 @@ jobs:
     name: Escaneo de secretos (gitleaks)
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
       - name: Instalar gitleaks 8.30.1 (SHA-256 verificado)
@@ -36,7 +36,7 @@ jobs:
       run:
         working-directory: backend
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
@@ -60,7 +60,7 @@ jobs:
       run:
         working-directory: frontend
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: actions/setup-node@v4
         with:
           node-version: '24'
@@ -75,7 +75,7 @@ jobs:
     runs-on: ubuntu-24.04
     needs: [backend, frontend]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Secretos efímeros para este job (nunca se imprimen)
         run: |
           {
@@ -123,7 +123,7 @@ jobs:
     runs-on: ubuntu-24.04
     needs: [backend, frontend]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Build backend
         run: docker build -t kahootp46-backend:ci backend
       - name: Build frontend
