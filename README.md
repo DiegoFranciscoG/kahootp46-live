@@ -10,11 +10,24 @@
 ![Redis](https://img.shields.io/badge/Redis-8-DC382D)
 ![License](https://img.shields.io/badge/License-MIT-blue)
 
-**Demo:** pendiente de despliegue (día 6 del plan) · **Usuario de prueba:** se publicará junto con la demo.
+**Demo:** pendiente de publicar (la guía está en [docs/despliegue.md](docs/despliegue.md)) · **Usuario de prueba:** el panel de admin usa la cuenta de `ADMIN_EMAIL`; el visor es anónimo y solo necesita el PIN.
 
-| Pregunta en vivo | Respuesta revelada |
-|---|---|
-| ![Pregunta en vivo](docs/img/viewer-question-mobile.jpg) | ![Respuesta revelada](docs/img/viewer-reveal-mobile.jpg) |
+![Demo del visor en el celular](docs/img/demo.gif)
+
+| Ingreso del PIN | Pregunta en vivo | Respuesta revelada |
+|---|---|---|
+| ![Ingreso del PIN](docs/img/inicio-movil.png) | ![Pregunta en vivo](docs/img/visor-pregunta-movil.png) | ![Respuesta revelada](docs/img/visor-respuesta-movil.png) |
+
+**Visor en escritorio** (pregunta abierta con historial, y respuesta revelada):
+
+![Visor en escritorio con la pregunta abierta](docs/img/visor-escritorio-pregunta.png)
+![Visor en escritorio con la respuesta revelada](docs/img/visor-escritorio-respuesta.png)
+
+**Panel de administración** (quizzes, editor y control de la partida):
+
+![Lista de quizzes](docs/img/admin-quizzes.png)
+![Editor de quiz](docs/img/admin-editor.png)
+![Panel del anfitrión](docs/img/admin-anfitrion.png)
 
 > Proyecto de portafolio sin afiliación con Kahoot! ASA. Funciona **solo** con partidas del motor propio QuizLive y no se conecta a servicios de terceros. Ver [Proveedores](docs/arquitectura.md#proveedores).
 
@@ -115,6 +128,8 @@ cd frontend && npm ci && npm start
 | `SPRING_PROFILES_ACTIVE` | `demo` carga los quizzes de ejemplo | No |
 | `FRONTEND_PORT` / `BACKEND_PORT` | Puertos en el host (4200 / 8081) | No |
 
+> Si tu sistema ya define una variable con el mismo nombre (por ejemplo `DB_PASSWORD`), `docker compose` usa la del sistema en lugar de la del `.env`.
+
 ## API y WebSocket
 
 | Método | Ruta | Descripción |
@@ -132,20 +147,32 @@ cd frontend && npm ci && npm start
 ## Tests y cobertura
 
 ```bash
-cd backend && ./mvnw verify        # 46 tests: unitarios + integración (Testcontainers) + Modulith + JaCoCo ≥ 70 %
-cd frontend && npm test            # Vitest: reducer del visor (dedupe por seq, huecos, reconexión, cronómetro)
+cd backend && ./mvnw verify        # 52 tests: unitarios + integración (Testcontainers) + Modulith + JaCoCo ≥ 70 %
+cd frontend && npm test            # Vitest: reducer del visor y lectura del PIN o del enlace
+# e2e (Playwright, escritorio y móvil) contra el stack levantado con docker compose:
+cd e2e && npm ci && npx playwright install chromium && set -a && . ../.env && set +a && npm test
 ```
 
-Incluyen: `LiveAnswerViewerIntegrationTest` (crear partida → PIN → viewer STOMP → `QUESTION_STARTED` → `ANSWER_REVEALED` → siguiente pregunta → `GAME_FINISHED`), PIN inválido o inexistente, reveal por tiempo, reconexión, **100 viewers simultáneos** y seguridad STOMP. Cobertura actual: 91 % de instrucciones. El mapa requisito → test está en [docs/arquitectura.md](docs/arquitectura.md#plan-de-pruebas).
+- **Backend:** `LiveAnswerViewerIntegrationTest` (crear partida → PIN → viewer STOMP → `QUESTION_STARTED` → `ANSWER_REVEALED` → siguiente pregunta → `GAME_FINISHED`), PIN inválido o inexistente, reveal por tiempo, reconexión, **100 viewers simultáneos**, seguridad STOMP y hosting del SPA. Cobertura actual: 91 % de instrucciones.
+- **e2e:** el viewer sigue una partida completa y consulta el historial, el servidor revela al agotarse el tiempo, **reconexión con el WebSocket cortado** (recupera lo que pasó sin conexión), recarga sin perder estado, PIN o enlace, y el admin crea un quiz, inicia la partida y un viewer recibe la respuesta. Corren en CI sobre `docker compose`.
+- **Carga:** [`loadtest/viewers.js`](loadtest/viewers.js) (k6) abre N viewers STOMP reales sobre un WebSocket y mide el tiempo entre que el servidor crea cada evento y el cliente lo recibe.
+
+  ```bash
+  docker run --rm --network kahootp46-live_default -e BASE_URL=http://frontend:8080     -e ADMIN_EMAIL -e ADMIN_PASSWORD -e VIEWERS=300     -v "$PWD/loadtest:/scripts:ro" grafana/k6:2.3.0 run /scripts/viewers.js
+  ```
+
+  Resultado medido el 2026-10-01 con `docker compose` en un PC de escritorio: **300 viewers simultáneos, 300 recibieron `QUESTION_STARTED` y `ANSWER_REVEALED`, 0 errores de socket y latencia del evento p95 = 97 ms (máximo 102 ms)**. La misma prueba contra la imagen única de despliegue con 50 viewers dio p95 = 97 ms. Son números de una máquina local, no de Render: allí el plan gratuito tiene 0,1 CPU.
+- El mapa requisito → test está en [docs/arquitectura.md](docs/arquitectura.md#plan-de-pruebas).
 
 ## Despliegue (gratis)
 
-Pendiente (día 6). Plan verificado en [docs/investigacion.md](docs/investigacion.md):
+Listo para publicar, sin tarjeta, en un solo servicio: la imagen del [`Dockerfile`](Dockerfile) de la raíz incluye el backend y el build de Angular (mismo origen, sin CORS). El [`render.yaml`](render.yaml) describe el servicio web y el Key Value. Los pasos y los límites verificados están en [docs/despliegue.md](docs/despliegue.md).
 
-- **Backend:** Render free. Soporta WebSocket y los mensajes WebSocket cuentan como tráfico, pero se duerme tras 15 min sin tráfico.
-- **Redis:** Render Key Value free (efímero: no importa, todo se reconstruye desde PostgreSQL).
-- **PostgreSQL:** Neon.
-- **Frontend:** Vercel, Netlify o GitHub Pages.
+| Pieza | Servicio | Límite del plan gratuito |
+|---|---|---|
+| Backend + frontend | Render web service (Docker) | 512 MB, 0,1 CPU, se duerme a los 15 min sin tráfico; WebSocket soportado |
+| Redis | Render Key Value | 25 MB, sin persistencia (todo es reconstruible) |
+| PostgreSQL | Neon (conexión directa, `sslmode=require`) | 0,5 GB |
 
 ## Seguridad aplicada
 
@@ -172,9 +199,10 @@ Pendiente (día 6). Plan verificado en [docs/investigacion.md](docs/investigacio
 
 ## Roadmap
 
-- [ ] Despliegue gratis (Render + Neon + Vercel) y GIF de demo.
-- [ ] Prueba e2e con Playwright (PIN → pregunta → respuesta).
-- [ ] Prueba de carga con k6 (500+ viewers).
+- [x] Pruebas e2e con Playwright, prueba de carga con k6, capturas y GIF.
+- [x] Imagen única y `render.yaml` listos para desplegar.
+- [ ] Publicar la demo en Render + Neon y poner su URL en este README.
+- [ ] Importar un quiz desde el reporte Excel que exporta Kahoot! (necesita un archivo de muestra para respetar su estructura real).
 - [ ] Versionado de quizzes (que el historial de partidas terminadas no cambie si se edita el quiz).
 - [ ] Avance automático configurable tras el reveal.
 - [ ] Adaptador para un proveedor externo **solo si** ofrece una API oficial en vivo y credenciales autorizadas.

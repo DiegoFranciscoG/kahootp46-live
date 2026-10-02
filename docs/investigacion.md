@@ -30,6 +30,9 @@ Consultadas el **2026-10-01**. Cuando dos fuentes difieren, prevalece la oficial
 | 24 | Kahoot! — Guía de la API de reportes | https://support.kahoot.com/hc/en-us/articles/11735948502931 | 2026-10-01 | API REST solo para clientes del plan más alto, OAuth2 *client credentials*, datos **después** de terminar la partida (90 días). **No existe API oficial de partidas en vivo** |
 | 25 | Kahoot! — Política de uso aceptable (2022-08-10) | https://trust.kahoot.com/acceptable-use-policy/ | 2026-10-01 | Prohíbe acceder a los servicios por cualquier medio distinto al provisto o por medios automatizados → no se implementa ningún conector no autorizado |
 | 26 | LOPDP Ecuador (R.O. 5.º Supl. 459, 26-may-2021) | https://www.gob.ec/regulaciones/ley-organica-proteccion-datos-personales-0 | 2026-10-01 | Minimización: los viewers son anónimos (sin nombre, correo ni cédula). Solo se guarda el correo del admin |
+| 27 | Render — especificación del Blueprint (`render.yaml`) | https://render.com/docs/blueprint-spec | 2026-10-01 | Sintaxis de servicio Docker, `generateValue`, `sync: false`, `fromService` con `connectionString` y Key Value. Plan gratis: web 512 MB / 0,1 CPU; Key Value 25 MB y 50 conexiones; `ipAllowList` es obligatorio |
+| 28 | Neon — connection pooling | https://neon.com/docs/connect/connection-pooling | 2026-10-01 | El pooler (PgBouncer, modo transacción) no soporta advisory locks de sesión: las migraciones de Flyway usan la conexión directa, con `sslmode=require` |
+| 29 | Docker Hub / MCR / npm / PyPI — versiones | https://hub.docker.com/r/grafana/k6 · https://mcr.microsoft.com/en-us/product/playwright/about · https://www.npmjs.com/package/@playwright/test | 2026-10-01 | Pruebas fijadas: Playwright 1.63.0 con su imagen oficial `v1.63.0-noble`, k6 2.3.0 y Pillow 12.3.0 (para armar el GIF del README) |
 
 ## Decisiones derivadas
 

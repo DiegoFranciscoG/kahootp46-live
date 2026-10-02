@@ -76,8 +76,11 @@ kahootp46-live/
 │       ├── features/home/         ingreso de PIN
 │       ├── features/admin/        login · quiz-list · quiz-editor · host-game
 │       └── shared/                status-badge · brand-logo · choice-style
-├── docs/                          investigación · modelo de datos · protocolo · arquitectura · http/
-├── docker-compose.yml
+├── e2e/                           Playwright (escritorio + móvil) y generador de capturas del README
+├── loadtest/                      k6: N viewers STOMP simultáneos
+├── docs/                          investigación · modelo de datos · protocolo · arquitectura · despliegue · http/
+├── docker-compose.yml             desarrollo local: nginx + backend + PostgreSQL + Redis
+├── Dockerfile · render.yaml       imagen única (backend + Angular) y Blueprint de Render
 └── .github/workflows/ci.yml
 ```
 
@@ -158,5 +161,9 @@ public interface QuizProvider {
 | CRUD, importación JSON/CSV, bloqueo en partida activa | `QuizApiIntegrationTest`, `QuizImportServiceTest`, `QuizRulesTest` |
 | Máquina de estados, PIN, contrato JSON | `GameTest`, `PinGeneratorTest`, `LiveEventJsonTest` |
 | Límites del monolito modular | `ModularityTests` |
+| Hosting del SPA en un solo origen (imagen de despliegue) | `SpaHostingIntegrationTest` (rutas del cliente, 404 en APIs inexistentes, HEAD, caché, cabeceras) |
+| Flujo completo en navegador (escritorio y móvil) | `e2e/tests/viewer.spec.ts`: partida completa, historial, reveal por tiempo, **reconexión con el WebSocket cortado**, recarga, PIN o enlace |
+| Panel de administración de punta a punta | `e2e/tests/admin.spec.ts`: crear quiz, iniciar partida y ver la respuesta en un viewer, importar CSV, redirección sin sesión |
+| 100+ viewers y latencia | `MultipleViewersIntegrationTest` (100) y `loadtest/viewers.js` (300, p95 de 97 ms) |
 
-Backend: `./mvnw verify` (JUnit 5 + Testcontainers con PostgreSQL 18 y Redis 8, más JaCoCo con un mínimo de 70 % en `game`, `quiz` y `viewer`). Frontend: `npm test` (Vitest).
+Backend: `./mvnw verify` (JUnit 5 + Testcontainers con PostgreSQL 18 y Redis 8, más JaCoCo con un mínimo de 70 % en `game`, `quiz` y `viewer`). Frontend: `npm test` (Vitest). e2e: `npm test` dentro de `e2e/` con el stack levantado.
