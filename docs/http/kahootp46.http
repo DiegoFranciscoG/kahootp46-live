@@ -1,0 +1,78 @@
+### KahootP46 Live — ejemplos REST (IntelliJ HTTP Client / VS Code REST Client)
+# Define en tu entorno local: host (http://localhost:4200), adminEmail, adminPassword. No guardes credenciales aquí.
+
+### 1. Login admin
+# @name login
+POST {{host}}/api/auth/login
+Content-Type: application/json
+
+{ "email": "{{adminEmail}}", "password": "{{adminPassword}}" }
+
+> {% client.global.set("adminToken", response.body.accessToken); %}
+
+### 2. Crear un quiz
+# @name quiz
+POST {{host}}/api/quizzes
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+  "title": "Historia del Ecuador",
+  "questions": [
+    {
+      "text": "¿Cuál es la capital del Ecuador?",
+      "timeLimit": 20,
+      "choices": [
+        { "text": "Guayaquil", "correct": false },
+        { "text": "Quito", "correct": true },
+        { "text": "Cuenca", "correct": false },
+        { "text": "Loja", "correct": false }
+      ]
+    }
+  ]
+}
+
+> {% client.global.set("quizId", response.body.id); %}
+
+### 3. Crear partida (genera el PIN)
+# @name game
+POST {{host}}/api/host/games
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{ "quizId": "{{quizId}}" }
+
+> {% client.global.set("gameId", response.body.id); client.global.set("pin", response.body.pin); %}
+
+### 4. Viewer: conectar con el PIN
+# @name connect
+POST {{host}}/api/games/connect
+Content-Type: application/json
+
+{ "pin": "{{pin}}" }
+
+> {% client.global.set("viewerToken", response.body.viewerToken); %}
+
+### 5. Iniciar partida (QUESTION_STARTED)
+POST {{host}}/api/host/games/{{gameId}}/start
+Authorization: Bearer {{adminToken}}
+
+### 6. Pregunta actual (sin respuesta hasta el reveal)
+GET {{host}}/api/games/{{pin}}/current
+Authorization: Bearer {{viewerToken}}
+
+### 7. Revelar (ANSWER_REVEALED)
+POST {{host}}/api/host/games/{{gameId}}/reveal
+Authorization: Bearer {{adminToken}}
+
+### 8. Historial
+GET {{host}}/api/games/{{pin}}/history
+Authorization: Bearer {{viewerToken}}
+
+### 9. Siguiente / terminar
+POST {{host}}/api/host/games/{{gameId}}/next
+Authorization: Bearer {{adminToken}}
+
+### 10. Cerrar partida
+POST {{host}}/api/host/games/{{gameId}}/finish
+Authorization: Bearer {{adminToken}}
