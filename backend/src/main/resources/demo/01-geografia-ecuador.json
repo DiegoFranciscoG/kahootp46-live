@@ -1,0 +1,65 @@
+{
+  "title": "Geografía del Ecuador",
+  "description": "Quiz de demostración con datos de cultura general.",
+  "questions": [
+    {
+      "question": "¿Cuál es la capital del Ecuador?",
+      "timeLimit": 20,
+      "choices": [
+        { "text": "Guayaquil", "correct": false },
+        { "text": "Quito", "correct": true },
+        { "text": "Cuenca", "correct": false },
+        { "text": "Loja", "correct": false }
+      ]
+    },
+    {
+      "question": "¿En qué océano se encuentran las Islas Galápagos?",
+      "timeLimit": 20,
+      "choices": [
+        { "text": "Atlántico", "correct": false },
+        { "text": "Índico", "correct": false },
+        { "text": "Pacífico", "correct": true },
+        { "text": "Ártico", "correct": false }
+      ]
+    },
+    {
+      "question": "¿Cuál es la montaña más alta del Ecuador?",
+      "timeLimit": 20,
+      "choices": [
+        { "text": "Cotopaxi", "correct": false },
+        { "text": "Cayambe", "correct": false },
+        { "text": "Tungurahua", "correct": false },
+        { "text": "Chimborazo", "correct": true }
+      ]
+    },
+    {
+      "question": "¿Qué moneda usa oficialmente Ecuador desde el año 2000?",
+      "timeLimit": 20,
+      "choices": [
+        { "text": "Sucre", "correct": false },
+        { "text": "Dólar estadounidense", "correct": true },
+        { "text": "Euro", "correct": false },
+        { "text": "Peso", "correct": false }
+      ]
+    },
+    {
+      "question": "¿Cuántas regiones naturales tiene Ecuador (Costa, Sierra, Amazonía e Insular)?",
+      "timeLimit": 20,
+      "choices": [
+        { "text": "2", "correct": false },
+        { "text": "3", "correct": false },
+        { "text": "4", "correct": true },
+        { "text": "5", "correct": false }
+      ]
+    },
+    {
+      "question": "Las Islas Galápagos pertenecen a Ecuador.",
+      "type": "TRUE_FALSE",
+      "timeLimit": 10,
+      "choices": [
+        { "text": "Verdadero", "correct": true },
+        { "text": "Falso", "correct": false }
+      ]
+    }
+  ]
+}

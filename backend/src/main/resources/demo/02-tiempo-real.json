@@ -1,0 +1,55 @@
+{
+  "title": "Tecnologías en tiempo real",
+  "description": "Quiz de demostración sobre WebSocket, STOMP y bases de datos.",
+  "questions": [
+    {
+      "question": "¿Qué protocolo mantiene una conexión bidireccional persistente entre navegador y servidor?",
+      "timeLimit": 20,
+      "choices": [
+        { "text": "FTP", "correct": false },
+        { "text": "WebSocket", "correct": true },
+        { "text": "SMTP", "correct": false },
+        { "text": "DNS", "correct": false }
+      ]
+    },
+    {
+      "question": "¿Qué significa la sigla STOMP?",
+      "timeLimit": 20,
+      "choices": [
+        { "text": "Simple Text Oriented Messaging Protocol", "correct": true },
+        { "text": "Secure Transfer Over Message Pipes", "correct": false },
+        { "text": "Streaming Transport Of Media Packets", "correct": false },
+        { "text": "Standard Token Oriented Mail Protocol", "correct": false }
+      ]
+    },
+    {
+      "question": "¿Qué puerto usa PostgreSQL por defecto?",
+      "timeLimit": 10,
+      "choices": [
+        { "text": "3306", "correct": false },
+        { "text": "6379", "correct": false },
+        { "text": "5432", "correct": true },
+        { "text": "8080", "correct": false }
+      ]
+    },
+    {
+      "question": "¿Qué estructura de Redis se usa para un ranking ordenado por puntaje?",
+      "timeLimit": 20,
+      "choices": [
+        { "text": "List", "correct": false },
+        { "text": "Sorted Set", "correct": true },
+        { "text": "Hash", "correct": false },
+        { "text": "Stream", "correct": false }
+      ]
+    },
+    {
+      "question": "Java 21 es una versión LTS.",
+      "type": "TRUE_FALSE",
+      "timeLimit": 10,
+      "choices": [
+        { "text": "Verdadero", "correct": true },
+        { "text": "Falso", "correct": false }
+      ]
+    }
+  ]
+}
