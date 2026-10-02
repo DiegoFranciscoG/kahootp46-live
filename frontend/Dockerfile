@@ -7,7 +7,7 @@ RUN npm ci --no-audit --no-fund
 COPY . .
 RUN npm run build
 
-FROM nginxinc/nginx-unprivileged:1.29.8-alpine
+FROM nginxinc/nginx-unprivileged:1.31.6-alpine
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 COPY --from=build /app/dist/kahootp46-web/browser /usr/share/nginx/html
 # nginx-unprivileged already runs as 101 (nginx); stated explicitly so scanners and readers can see it.
