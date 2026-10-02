@@ -47,3 +47,8 @@ local.properties
 nbproject/private/
 .DS_Store
 Thumbs.db
+
+# ---- e2e / capturas
+test-results/
+playwright-report/
+e2e/capture-frames/
