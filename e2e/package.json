@@ -1,0 +1,15 @@
+{
+  "name": "kahootp46-e2e",
+  "private": true,
+  "version": "0.1.0",
+  "description": "End-to-end tests (Playwright) against the running docker compose stack",
+  "scripts": {
+    "test": "playwright test",
+    "capture": "playwright test --config=capture.config.ts"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.63.0",
+    "@types/node": "24.19.1",
+    "typescript": "6.0.3"
+  }
+}
