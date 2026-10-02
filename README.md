@@ -147,7 +147,7 @@ cd frontend && npm ci && npm start
 ## Tests y cobertura
 
 ```bash
-cd backend && ./mvnw verify        # 52 tests: unitarios + integración (Testcontainers) + Modulith + JaCoCo ≥ 70 %
+cd backend && ./mvnw verify        # 53 tests: unitarios + integración (Testcontainers) + Modulith + JaCoCo ≥ 70 %
 cd frontend && npm test            # Vitest: reducer del visor y lectura del PIN o del enlace
 # e2e (Playwright, escritorio y móvil) contra el stack levantado con docker compose:
 cd e2e && npm ci && npx playwright install chromium && set -a && . ../.env && set +a && npm test
