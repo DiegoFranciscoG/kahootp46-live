@@ -27,7 +27,8 @@ spring:
       max-request-size: 300KB
 
 server:
-  port: ${APP_PORT:8080}
+  # PORT is injected by PaaS platforms such as Render; APP_PORT is for local runs.
+  port: ${PORT:${APP_PORT:8080}}
   forward-headers-strategy: native
   shutdown: graceful
   error:
@@ -57,7 +58,9 @@ app:
     admin-token-ttl: PT1H
     viewer-token-ttl: PT4H
   cors:
-    allowed-origins: ${CORS_ALLOWED_ORIGINS}
+    # RENDER_EXTERNAL_URL is the service's own public URL; with the SPA served from the same origin that is all we need.
+    allowed-origins: ${CORS_ALLOWED_ORIGINS:${RENDER_EXTERNAL_URL}}
+  serve-spa: ${APP_SERVE_SPA:false}
   admin:
     email: ${ADMIN_EMAIL}
     password: ${ADMIN_PASSWORD}

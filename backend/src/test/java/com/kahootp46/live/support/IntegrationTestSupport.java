@@ -119,6 +119,37 @@ public abstract class IntegrationTestSupport {
         return send(request(path, token).GET());
     }
 
+    protected record RawResult(int status, String body, java.net.http.HttpHeaders headers) {
+        public String header(String name) {
+            return headers.firstValue(name).orElse("");
+        }
+    }
+
+    protected int headStatus(String path, String token) {
+        try {
+            return http.send(request(path, token).method("HEAD", BodyPublishers.noBody()).build(),
+                    BodyHandlers.discarding()).statusCode();
+        } catch (IOException ex) {
+            throw new IllegalStateException(ex);
+        } catch (InterruptedException ex) {
+            Thread.currentThread().interrupt();
+            throw new IllegalStateException(ex);
+        }
+    }
+
+    /** Response as-is (HTML, JavaScript...), for endpoints that do not answer JSON. */
+    protected RawResult raw(String path, String token) {
+        try {
+            HttpResponse<String> response = http.send(request(path, token).GET().build(), BodyHandlers.ofString());
+            return new RawResult(response.statusCode(), response.body(), response.headers());
+        } catch (IOException ex) {
+            throw new IllegalStateException(ex);
+        } catch (InterruptedException ex) {
+            Thread.currentThread().interrupt();
+            throw new IllegalStateException(ex);
+        }
+    }
+
     protected HttpResult post(String path, Object body, String token) {
         return post(path, body, token, Map.of());
     }

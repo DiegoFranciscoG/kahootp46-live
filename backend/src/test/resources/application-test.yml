@@ -8,6 +8,8 @@ CORS_ALLOWED_ORIGINS: http://localhost:4200
 ADMIN_EMAIL: admin@kahootp46.test
 
 app:
+  # The whole integration suite runs with the bundled SPA enabled to prove the API behaves the same.
+  serve-spa: true
   rate-limit:
     connect-per-minute: 30
     login-per-minute: 1000
