@@ -33,6 +33,7 @@ Consultadas el **2026-10-01**. Cuando dos fuentes difieren, prevalece la oficial
 | 27 | Render — especificación del Blueprint (`render.yaml`) | https://render.com/docs/blueprint-spec | 2026-10-01 | Sintaxis de servicio Docker, `generateValue`, `sync: false`, `fromService` con `connectionString` y Key Value. Plan gratis: web 512 MB / 0,1 CPU; Key Value 25 MB y 50 conexiones; `ipAllowList` es obligatorio |
 | 28 | Neon — connection pooling | https://neon.com/docs/connect/connection-pooling | 2026-10-01 | El pooler (PgBouncer, modo transacción) no soporta advisory locks de sesión: las migraciones de Flyway usan la conexión directa, con `sslmode=require` |
 | 29 | Docker Hub / MCR / npm / PyPI — versiones | https://hub.docker.com/r/grafana/k6 · https://mcr.microsoft.com/en-us/product/playwright/about · https://www.npmjs.com/package/@playwright/test | 2026-10-01 | Pruebas fijadas: Playwright 1.63.0 con su imagen oficial `v1.63.0-noble`, k6 2.3.0 y Pillow 12.3.0 (para armar el GIF del README) |
+| 30 | Trivy 0.75.0 (Aqua Security) — escaneo de `pom.xml`, lockfiles y Dockerfiles | https://trivy.dev | 2026-10-01 | Hallazgos con Spring Boot 4.1.1: Tomcat 11.0.24 (CVE-2026-65182, -65905, -68525, CRITICAL), Jackson 2.21.5 y 3.1.5 (CVE-2026-68497, -89407, -89425, -91776, -91777, HIGH) y el frontend sin `USER` explícito. Corregido con Tomcat 11.0.25, Jackson 2.21.7 / 3.1.7 y `USER 101`; el reescaneo da 0 HIGH/CRITICAL. No existe Spring Boot 4.1.2 estable (Maven Central, 2026-10-01): los overrides del `pom.xml` se quitan cuando salga |
 
 ## Decisiones derivadas
 

@@ -185,6 +185,7 @@ Listo para publicar, sin tarjeta, en un solo servicio: la imagen del [`Dockerfil
 - BCrypt, Bean Validation en los DTO, ProblemDetail sin stack traces, Actuator con solo `health`, CSP y headers de seguridad en nginx y Spring.
 - Subida de archivos: solo `.json`/`.csv`, 256 KB como máximo, UTF-8 validado, el nombre de archivo no se guarda.
 - Docker: imágenes con versión fija, multi-stage, usuario no root, healthchecks, puertos ligados a `127.0.0.1`.
+- Dependencias escaneadas con **trivy** (`pom.xml`, `package-lock.json`, Dockerfiles): 0 vulnerabilidades HIGH/CRITICAL. Tomcat y Jackson van con versiones parcheadas respecto al BOM de Spring Boot 4.1.1 (ver `backend/pom.xml`).
 - LOPDP: viewers anónimos; el único dato personal es el correo del admin.
 
 ## Decisiones técnicas
