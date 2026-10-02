@@ -1,0 +1,3 @@
+app:
+  demo:
+    seed-enabled: true
