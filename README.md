@@ -99,7 +99,7 @@ cd frontend && npm ci && npm start
 
 1. **Crear un quiz:** en Admin, *Crear quiz* (preguntas, opciones, correcta, tiempo) o *Importar JSON/CSV* ([formatos](docs/protocolo-websocket.md#importación-de-quizzes)).
 2. **Iniciar una partida:** *Iniciar partida* genera un **PIN de 6 dígitos**. En la vista del anfitrión están *Iniciar*, *Revelar*, *Siguiente* y *Cerrar partida*.
-3. **Conectarse con el PIN:** en el móvil, abrir la app, escribir el PIN y pulsar **CONECTAR**.
+3. **Conectarse con el PIN o el enlace:** en el móvil, abrir la app, escribir el PIN de 6 dígitos o pegar el enlace de la partida (`…/live/123456`) y pulsar **CONECTAR**. Los PIN o enlaces de otros servicios (por ejemplo Kahoot!) se rechazan con una explicación.
 4. **El visor:** muestra cada pregunta en cuanto empieza. Al acabarse el tiempo, o si el anfitrión revela antes, aparece la respuesta correcta, y la siguiente pregunta entra sola.
 
 ## Variables de entorno
