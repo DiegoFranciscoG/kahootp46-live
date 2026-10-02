@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1
 
-FROM eclipse-temurin:21.0.12.1_1-jdk-alpine AS build
+FROM eclipse-temurin:24.0.2_12-jdk-alpine AS build
 WORKDIR /workspace
 COPY .mvn/ .mvn/
 COPY mvnw pom.xml ./
@@ -10,7 +10,7 @@ COPY src/ src/
 RUN ./mvnw -B -ntp -q -DskipTests package \
     && java -Djarmode=tools -jar target/kahootp46-live-*.jar extract --layers --launcher --destination extracted
 
-FROM eclipse-temurin:21.0.12.1_1-jre-alpine
+FROM eclipse-temurin:24.0.2_12-jre-alpine
 RUN addgroup -S app && adduser -S -G app app
 WORKDIR /app
 COPY --from=build --chown=app:app /workspace/extracted/dependencies/ ./
