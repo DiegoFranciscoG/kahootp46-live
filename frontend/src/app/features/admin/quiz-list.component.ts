@@ -42,7 +42,7 @@ import { HostGame, QuizSummary } from '../../core/models/admin.models';
           @if (quiz.description) {
             <p class="mt-1 line-clamp-2 text-sm text-slate-400">{{ quiz.description }}</p>
           }
-          <p class="mt-2 text-xs text-slate-500">{{ quiz.questionCount }} preguntas · {{ quiz.updatedAt | date: 'short' }}</p>
+          <p class="mt-2 text-xs text-slate-500">{{ quiz.questionCount }} preguntas · {{ quiz.updatedAt | date: 'dd/MM/yyyy HH:mm' }}</p>
           <div class="mt-4 flex flex-wrap gap-2 text-sm font-bold">
             <button type="button" (click)="startGame(quiz)" [disabled]="busy()"
                     class="rounded-lg bg-emerald-600 px-3 py-2 hover:bg-emerald-500 disabled:opacity-40">Iniciar partida</button>

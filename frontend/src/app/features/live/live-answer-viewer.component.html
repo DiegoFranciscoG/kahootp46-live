@@ -63,18 +63,18 @@
           <a routerLink="/" class="mt-4 inline-block rounded-xl bg-white/10 px-5 py-2.5 font-semibold hover:bg-white/15">Ingresar otro PIN</a>
         </div>
       } @else if (view(); as q) {
-        @if (newQuestionWaiting()) {
-          <button
-            type="button"
-            (click)="backToLive()"
-            class="w-full rounded-xl bg-rose-500/15 px-4 py-3 text-sm font-bold text-rose-200 ring-1 ring-rose-400/40 hover:bg-rose-500/25"
+        @if (!q.live) {
+          <div
+            class="flex items-center justify-between gap-3 rounded-xl px-4 py-3 text-sm ring-1"
+            [class]="newQuestionWaiting() ? 'bg-rose-500/15 text-rose-100 ring-rose-400/40' : 'bg-white/5 text-slate-300 ring-white/10'"
           >
-            ● Nueva pregunta en vivo · Ver ahora
-          </button>
-        } @else if (!q.live) {
-          <div class="flex items-center justify-between gap-3 rounded-xl bg-white/5 px-4 py-3 text-sm text-slate-300 ring-1 ring-white/10">
-            <span>Estás consultando la pregunta {{ q.number }} (cerrada).</span>
-            <button type="button" (click)="backToLive()" class="font-bold text-violet-300 hover:text-violet-200">Volver al vivo</button>
+            <span>
+              Estás consultando la pregunta {{ q.number }} (cerrada).
+              @if (newQuestionWaiting()) {
+                <b class="block sm:inline">● Hay una pregunta en vivo.</b>
+              }
+            </span>
+            <button type="button" (click)="backToLive()" class="shrink-0 font-bold text-violet-300 hover:text-violet-200">Volver al vivo</button>
           </div>
         }
 

@@ -132,6 +132,13 @@ describe('live game reducer', () => {
     expect(secondsLeft(state, T0 + 60_000)).toBe(0);
   });
 
+  it('never shows more seconds than the question allows, even with an imprecise clock offset', () => {
+    const state = applyEvent(connected(), questionStarted(1, 1), T0);
+
+    expect(secondsLeft({ ...state, clockOffsetMs: -800 }, T0)).toBe(20);
+    expect(secondsLeft({ ...state, clockOffsetMs: -30_000 }, T0)).toBe(20);
+  });
+
   it('reports GAME_ERROR as an error state', () => {
     const state = applyEvent(connected(), {
       ...envelope('GAME_ERROR', 0),

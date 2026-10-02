@@ -45,18 +45,19 @@
       <div class="flex flex-wrap gap-3 text-sm">
         <label class="flex items-center gap-2 font-semibold text-slate-300">
           Tipo
-          <select [value]="question.type" (change)="setType(qi, $any(text($event)))"
+          <select (change)="setType(qi, $any(text($event)))"
                   class="rounded-lg bg-slate-950 px-2 py-1.5 ring-1 ring-white/10">
-            <option value="SINGLE_CHOICE">Opción única</option>
-            <option value="TRUE_FALSE">Verdadero / Falso</option>
+            <option value="SINGLE_CHOICE" [selected]="question.type === 'SINGLE_CHOICE'">Opción única</option>
+            <option value="TRUE_FALSE" [selected]="question.type === 'TRUE_FALSE'">Verdadero / Falso</option>
           </select>
         </label>
         <label class="flex items-center gap-2 font-semibold text-slate-300">
           Tiempo
-          <select [value]="question.timeLimit" (change)="updateQuestion(qi, { timeLimit: +text($event) })"
+          <select (change)="updateQuestion(qi, { timeLimit: +text($event) })"
                   class="rounded-lg bg-slate-950 px-2 py-1.5 ring-1 ring-white/10">
+            <!-- [selected] per option: a [value] on the select is applied before the options exist and falls back to the first one. -->
             @for (seconds of timeLimits; track seconds) {
-              <option [value]="seconds">{{ seconds }} s</option>
+              <option [value]="seconds" [selected]="seconds === question.timeLimit">{{ seconds }} s</option>
             }
           </select>
         </label>

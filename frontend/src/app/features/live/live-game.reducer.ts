@@ -193,5 +193,7 @@ export function secondsLeft(state: LiveGameState, now: number): number {
     return 0;
   }
   const remainingMs = Date.parse(state.current.endsAt) - (now + state.clockOffsetMs);
-  return Math.max(0, Math.ceil(remainingMs / 1000));
+  // The offset is estimated from one round trip, so it can be off by a fraction of a second:
+  // never show more time than the question has.
+  return Math.min(state.current.timeLimitSeconds, Math.max(0, Math.ceil(remainingMs / 1000)));
 }
