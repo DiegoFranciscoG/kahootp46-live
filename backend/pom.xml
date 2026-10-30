@@ -31,7 +31,7 @@
 		<spring-modulith.version>2.1.1</spring-modulith.version>
 		<springdoc.version>3.1.1</springdoc.version>
 		<commons-csv.version>1.14.1</commons-csv.version>
-		<jacoco.version>0.8.15</jacoco.version>
+		<jacoco.version>0.8.16</jacoco.version>
 	</properties>
 
 	<dependencies>
